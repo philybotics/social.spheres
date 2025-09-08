@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>𝐏𝐇𝐈𝐋𝐘𝐁𝐎𝐓𝐈𝐂𝐒™.𝚌𝚝.𝚠𝚜</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --card: #fffffff;
+    --text: #008000;
+    --muted: #C0C0C0;
+    --accent: #008000;
+    --border: #ffffff;
+  }
+  * { box-sizing: border-box }
+  body {
+    margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    background: radial-gradient(1200px 600px at 10% -10%, #122033 0%, var(--bg) 60%);
+    color: var(--text);
+    padding: 20px;
+  }
+  .widget {
+    max-width: 1100px; margin: 0 auto; display: grid; gap: 16px;
+  }
+  .header {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    background: linear-gradient(180deg, #122033 0%, var(--card) 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px; padding: 14px 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.02);
+  }
+  .title {
+    font-size: 18px; font-weight: 700; letter-spacing: .2px; display:flex; gap:10px; align-items:center;
+  }
+  .title .dot { width:10px; height:10px; border-radius:50%; background: var(--accent); box-shadow: 0 0 18px var(--accent); }
+  .controls { display: flex; gap: 10px; flex-wrap: wrap; }
+  .controls > * {
+    background: #0f151d; color: var(--text); border: 1px solid var(--border);
+    padding: 8px 10px; border-radius: 12px; font-size: 14px;
+  }
+  .controls input[type="number"] { width: 90px; }
+  .btn {
+    cursor: pointer; transition: transform .04s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn:hover { box-shadow: 0 0 0 1px var(--accent) inset, 0 0 24px rgba(77,163,255,.15); }
+  .btn:active { transform: translateY(1px) scale(.99); }
+  .grid {
+    display: grid; gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .card {
+    display: grid; grid-template-rows: auto 1fr auto; gap: 10px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 18px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.02);
+  }
+  .thumb {
+    aspect-ratio: 16/9; width: 100%; object-fit: cover; background: #0c1218;
+  }
+  .content { padding: 12px 14px; display: grid; gap: 8px; }
+  .item-title {
+    font-weight: 700; line-height: 1.25; font-size: 16px; margin: 0;
+  }
+  .item-title a { color: var(--text); text-decoration: none; }
+  .item-title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .meta { color: var(--muted); font-size: 12px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .desc { color: #c9d6e4; font-size: 14px; line-height: 1.45; }
+  .footer {
+    display:flex; justify-content: space-between; align-items:center; padding: 10px 14px; color: var(--muted); font-size: 12px; border-top: 1px solid var(--border);
+  }
+  .source a { color: var(--accent); text-decoration: none; }
+  .source a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  .empty, .error {
+    padding: 18px; border-radius: 16px; background: #0f151d; border: 1px dashed var(--border); color: var(--muted);
+  }
+  .hidden { display: none !important; }
+  .toggle { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; }
+  .toggle input { accent-color: var(--accent); }
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  @media (max-width:520px){ .grid{ grid-template-columns: 1fr } }
+</style>
+</head>
+<body>
+  <div class="widget" id="rssWidget">
+    <div class="header">
+      <div class="title"><span class="dot" aria-hidden="true"></span>𝐏𝐇𝐈𝐋𝐘𝐁𝐎𝐓𝐈𝐂𝐒™.𝚌𝚝.𝚠𝚜</div>
+      <div class="controls">
+        <label class="toggle" title="Show or hide thumbnails">
+          <input type="checkbox" id="toggleImages" checked />
+          <span> </span>
+        </label>
+        <label title="Max items to display">
+          <span class="sr-only">Max items</span>
+          <input type="number" id="maxItems" min="1" max="50" value="12" />
+        </label>
+        <button class="btn" id="refreshBtn">🗞️</button>
+      </div>
+    </div>
+
+    <div id="status" class="empty">Loading Latest articles…</div>
+    <div id="grid" class="grid hidden" aria-live="polite"></div>
+
+    <div class="footer">
+      <div class="source">𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈: <a href="https://phys.org/rss-feed/" target="_blank" rel="noopener">𝐏𝐇𝐈𝐋𝐘𝐁𝐎𝐓𝐈𝐂𝐒™</a></div>
+      <div id="fetchedAt">—</div>
+    </div>
+  </div>
+
+<script>
+(() => {
+  const FEED_URL = " https://feeds.bbci.co.uk/news/world/rss.xml";
+  // Public CORS passthrough. If direct fetch is blocked, we fall back to this.
+  const PROXY = (url) => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url);
+
+  const els = {
+    grid: document.getElementById("grid"),
+    status: document.getElementById("status"),
+    fetchedAt: document.getElementById("fetchedAt"),
+    maxItems: document.getElementById("maxItems"),
+    refresh: document.getElementById("refreshBtn"),
+    toggleImages: document.getElementById("toggleImages"),
+  };
+
+  const state = {
+    showImages: true,
+    maxItems: 12,
+    lastXML: null,
+  };
+
+  // Utilities
+  const stripHTML = (html) => {
+    const div = document.createElement("div");
+    div.innerHTML = html || "";
+    // Remove scripts/styles
+    div.querySelectorAll("script,style,noscript").forEach(n => n.remove());
+    return (div.textContent || "").replace(/\s+\n/g, "\n").trim();
+  };
+
+  const extractFirstImg = (html) => {
+    if (!html) return null;
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    const img = div.querySelector("img");
+    return img?.getAttribute("src") || null;
+  };
+
+  // Try to find a usable image for the item
+  const getItemImage = (item) => {
+    // <media:content> or <media:thumbnail>
+    let m = item.querySelector('media\\:content, content'); // namespace-safe query
+    if (m?.getAttribute) {
+      const u = m.getAttribute("url") || m.getAttribute("src");
+      if (u) return u;
+    }
+    m = item.querySelector('media\\:thumbnail, thumbnail');
+    if (m?.getAttribute) {
+      const u = m.getAttribute("url") || m.getAttribute("src");
+      if (u) return u;
+    }
+    // <enclosure url="...">
+    const enc = item.querySelector("enclosure");
+    if (enc) {
+      const type = enc.getAttribute("type") || "";
+      const u = enc.getAttribute("url");
+      if (u && type.startsWith("image/")) return u;
+    }
+    // Fallback: any <img> inside description
+    const descHTML = item.querySelector("description")?.textContent || "";
+    const fromDesc = extractFirstImg(descHTML);
+    if (fromDesc) return fromDesc;
+    return null;
+  };
+
+  const fmtDate = (dStr) => {
+    if (!dStr) return "";
+    const d = new Date(dStr);
+    if (isNaN(d)) return stripHTML(dStr);
+    return new Intl.DateTimeFormat(undefined, {
+      year: "numeric", month: "short", day: "2-digit",
+      hour: "2-digit", minute: "2-digit"
+    }).format(d);
+  };
+
+  async function fetchText(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.text();
+  }
+
+  async function loadFeed() {
+    els.status.classList.remove("hidden");
+    els.grid.classList.add("hidden");
+    els.status.textContent = "Loading latest articles…";
+
+    // Try direct fetch first; if it fails (likely CORS), use proxy
+    let xmlText = "";
+    try {
+      xmlText = await fetchText(FEED_URL);
+    } catch (e1) {
+      try {
+        xmlText = await fetchText(PROXY(FEED_URL));
+      } catch (e2) {
+        els.status.classList.remove("hidden");
+        els.grid.classList.add("hidden");
+        els.status.className = "error";
+        els.status.innerHTML = `
+          <strong>Couldn't load the RSS feed.</strong><br/>
+          Reason: <code>${(e2 && e2.message) || "Unknown error"}</code><br/>
+          
+          
+        `;
+        return;
+      }
+    }
+
+    state.lastXML = xmlText;
+    render(xmlText);
+  }
+
+  function render(xmlText) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "application/xml");
+
+    const parseError = xml.querySelector("parsererror");
+    if (parseError) {
+      els.status.classList.remove("hidden");
+      els.grid.classList.add("hidden");
+      els.status.className = "error";
+      els.status.innerHTML = `<strong>XML parse error:</strong> ${stripHTML(parseError.textContent || "")}`;
+      return;
+    }
+
+    const items = Array.from(xml.querySelectorAll("item"));
+    if (!items.length) {
+      els.status.classList.remove("hidden");
+      els.grid.classList.add("hidden");
+      els.status.className = "empty";
+      els.status.textContent = "No items found in the feed.";
+      return;
+    }
+
+    const max = Math.max(1, Math.min(50, state.maxItems));
+    const slice = items.slice(0, max);
+
+    const frag = document.createDocumentFragment();
+    slice.forEach(item => {
+      const title = item.querySelector("title")?.textContent?.trim() || "(untitled)";
+      const link = item.querySelector("link")?.textContent?.trim() || "#";
+      const pubDate = item.querySelector("pubDate")?.textContent?.trim() || "";
+      const descHTML = item.querySelector("description")?.textContent || "";
+      const desc = stripHTML(descHTML).replace(/\s{3,}/g, " ").slice(0, 280) + (descHTML.length > 280 ? "…" : "");
+      const img = getItemImage(item);
+
+      const card = document.createElement("article");
+      card.className = "card";
+
+      if (state.showImages && img) {
+        const imgEl = document.createElement("img");
+        imgEl.className = "thumb";
+        imgEl.alt = "";
+        imgEl.loading = "lazy";
+        imgEl.referrerPolicy = "no-referrer";
+        imgEl.src = img;
+        imgEl.onerror = () => imgEl.remove(); // cleanly remove if broken
+        card.appendChild(imgEl);
+      }
+
+      const content = document.createElement("div");
+      content.className = "content";
+
+      const h3 = document.createElement("h3");
+      h3.className = "item-title";
+      const a = document.createElement("a");
+      a.href = link; a.target = "_blank"; a.rel = "noopener";
+      a.textContent = title;
+      h3.appendChild(a);
+
+      const meta = document.createElement("div");
+      meta.className = "meta";
+      meta.innerHTML = `<span>${fmtDate(pubDate)}</span>`;
+
+      const p = document.createElement("p");
+      p.className = "desc";
+      p.textContent = desc;
+
+      content.append(h3, meta, p);
+      card.appendChild(content);
+
+      frag.appendChild(card);
+    });
+
+    els.grid.innerHTML = "";
+    els.grid.appendChild(frag);
+    els.status.classList.add("hidden");
+    els.grid.classList.remove("hidden");
+    els.fetchedAt.textContent = "Updated: " + new Date().toLocaleString();
+  }
+
+  // Events
+  els.refresh.addEventListener("click", loadFeed);
+  els.maxItems.addEventListener("change", (e) => {
+    state.maxItems = Number(e.target.value) || 12;
+    if (state.lastXML) render(state.lastXML);
+  });
+  els.toggleImages.addEventListener("change", (e) => {
+    state.showImages = !!e.target.checked;
+    if (state.lastXML) render(state.lastXML);
+  });
+
+  // Kick off
+  loadFeed();
+})();
+</script>
+</body>
+</html>
